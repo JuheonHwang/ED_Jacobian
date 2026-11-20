@@ -25,13 +25,13 @@
 
 **KO** — 노드 $k$는 위치 $g_k$(소스 정점 중 하나)에 있고 $3\times3$ 행렬 $A_k$와 이동 $t_k$를 가집니다. 정점 $v_i$는 가장 가까운 노드 $K$개의 영향을 가중치 $w_{ik}$로 받습니다.
 
-$$\tilde v_i = \sum_{k \in \mathcal N(i)} w_{ik}\,\bigl[A_k (v_i - g_k) + g_k + t_k\bigr]$$
+$$\tilde v_i = \sum_{k \in \mathcal N(i)} w_{ik} \bigl[A_k (v_i - g_k) + g_k + t_k\bigr]$$
 
 **EN** — A global rigid motion (rotation $R$ about the source centroid $c$, translation $T$) is applied on top:
 
 **KO** — 그 위에 전역 강체 운동(소스 무게중심 $c$를 중심으로 한 회전 $R$, 이동 $T$)을 적용합니다.
 
-$$v'_i = R\,(\tilde v_i - c) + c + T$$
+$$v'_i = R (\tilde v_i - c) + c + T$$
 
 **EN** — $R$ is parameterised by a rotation vector $r$ (axis × angle), $R = \exp([r]_\times)$, computed by `edreg.rodrigues`.
 

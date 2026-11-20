@@ -28,7 +28,7 @@ hist.exitReason   % why it stopped / 종료 이유
 
 ## 5.2 Gradient descent
 
-$$P \leftarrow P - \alpha\, s \odot g$$
+$$P \leftarrow P - \alpha  s \odot g$$
 
 **EN** — The simplest method: step against the gradient. $s$ scales the six global parameters by 0.01, because a unit change of the rotation vector moves every vertex by hundreds of millimetres while a unit change of one node translation moves a few vertices by one. Without it the global block dominates and the step size cannot suit both.
 
@@ -40,7 +40,7 @@ The step size $\alpha$ is fixed and there is no line search, so the cost can go 
 
 ## 5.3 Gauss-Newton
 
-$$J^\top J\, d = -J^\top F, \qquad P \leftarrow P + d$$
+$$J^\top J  d = -J^\top F, \qquad P \leftarrow P + d$$
 
 **EN** — Linearise $F(P + d) \approx F + Jd$ and minimise the linearised cost exactly. This uses curvature information and converges in a handful of iterations when it works, but the full step is taken unconditionally.
 
@@ -66,7 +66,7 @@ At the identity the two give the same step: $J$ has exactly six zero singular va
 
 ## 5.4 Levenberg-Marquardt
 
-$$\bigl(J^\top J + \lambda\, \mathrm{diag}(J^\top J)\bigr)\, d = -J^\top F$$
+$$\bigl(J^\top J + \lambda  \mathrm{diag}(J^\top J)\bigr)  d = -J^\top F$$
 
 **EN** — Damping interpolates between the two previous methods: $\lambda \to 0$ gives Gauss-Newton, large $\lambda$ gives a short, scaled gradient step. It also makes the matrix positive definite, which removes the singularity problem above. The step is accepted only if the cost goes down.
 

@@ -35,11 +35,11 @@
 
 ## 3.2 Shared block: derivative of the deformed vertices / 공용 블록: 변형 정점의 미분
 
-**EN** — Fit and Laplacian both depend on $P$ only through the deformed vertices, so `deformJacobian` computes $\partial V' / \partial P$ ($3n \times (6+12N)$) once. Recall
+**EN** — Fit and Laplacian both depend on $P$ only through the deformed vertices, so `deformJacobian` computes $\partial V' / \partial P$, a $3n \times (6+12N)$ matrix, once. Recall
 
-**KO** — fit과 Laplacian은 변형된 정점을 통해서만 $P$에 의존하므로, `deformJacobian`이 $\partial V' / \partial P$ ($3n \times (6+12N)$)를 한 번 계산해 둡니다. 변형 식은 다음과 같았습니다.
+**KO** — fit과 Laplacian은 변형된 정점을 통해서만 $P$에 의존하므로, `deformJacobian`이 $3n \times (6+12N)$ 크기의 $\partial V' / \partial P$를 한 번 계산해 둡니다. 변형 식은 다음과 같았습니다.
 
-$$u_i = \sum_k w_{ik}\,[A_k (v_i - g_k) + g_k + t_k] - c, \qquad v'_i = R\,u_i + c + T$$
+$$u_i = \sum_k w_{ik} [A_k (v_i - g_k) + g_k + t_k] - c, \qquad v'_i = R u_i + c + T$$
 
 **EN** — Writing $v'_{i,a}$ for coordinate $a$ of vertex $i$:
 
@@ -49,8 +49,8 @@ $$u_i = \sum_k w_{ik}\,[A_k (v_i - g_k) + g_k + t_k] - c, \qquad v'_i = R\,u_i +
 |---|---|
 | $R_{ab}$ | $u_{i,b}$ |
 | $T_a$ | $1$ |
-| $(A_k)_{bc}$ | $w_{ik}\,R_{ab}\,(v_i - g_k)_c$ |
-| $(t_k)_b$ | $w_{ik}\,R_{ab}$ |
+| $(A_k)_{bc}$ | $w_{ik} R_{ab} (v_i - g_k)_c$ |
+| $(t_k)_b$ | $w_{ik} R_{ab}$ |
 
 **EN** — The last two are non-zero only when node $k$ is one of the $K$ neighbours of vertex $i$. That is the source of sparsity: each vertex row touches $12K$ of the $12N$ node columns (8% for $K = 4$, $N = 50$, and less as $N$ grows).
 
@@ -58,11 +58,11 @@ $$u_i = \sum_k w_{ik}\,[A_k (v_i - g_k) + g_k + t_k] - c, \qquad v'_i = R\,u_i +
 
 ### Rotation vector / 회전 벡터
 
-**EN** — The optimiser works with the rotation vector $r$, not with $R$, so the $R$ block is chained with $\partial\,\mathrm{vec}(R) / \partial r$ (a $9 \times 3$ matrix). With $\theta = \lVert r \rVert$, $K = [r]_\times$, $a = \sin\theta/\theta$, $b = (1-\cos\theta)/\theta^2$:
+**EN** — The optimiser works with the rotation vector $r$, not with $R$, so the $R$ block is chained with $\partial \mathrm{vec}(R) / \partial r$ (a $9 \times 3$ matrix). With $\theta = \lVert r \rVert$, $K = [r]_\times$, $a = \sin\theta/\theta$, $b = (1-\cos\theta)/\theta^2$:
 
-**KO** — 최적화 변수는 $R$이 아니라 회전 벡터 $r$이므로, $R$ 블록에 $\partial\,\mathrm{vec}(R) / \partial r$ ($9 \times 3$ 행렬)을 곱해 연쇄법칙을 적용합니다. $\theta = \lVert r \rVert$, $K = [r]_\times$, $a = \sin\theta/\theta$, $b = (1-\cos\theta)/\theta^2$로 두면:
+**KO** — 최적화 변수는 $R$이 아니라 회전 벡터 $r$이므로, $R$ 블록에 $\partial \mathrm{vec}(R) / \partial r$ ($9 \times 3$ 행렬)을 곱해 연쇄법칙을 적용합니다. $\theta = \lVert r \rVert$, $K = [r]_\times$, $a = \sin\theta/\theta$, $b = (1-\cos\theta)/\theta^2$로 두면:
 
-$$R = I + aK + bK^2, \qquad \frac{\partial R}{\partial r_i} = aK_i + b\,(K_i K + K K_i) + r_i\left(\frac{a'}{\theta}K + \frac{b'}{\theta}K^2\right), \quad K_i = [e_i]_\times$$
+$$R = I + aK + bK^2, \qquad \frac{\partial R}{\partial r_i} = aK_i + b (K_i K + K K_i) + r_i\left(\frac{a'}{\theta}K + \frac{b'}{\theta}K^2\right), \quad K_i = [e_i]_\times$$
 
 **EN** — The optimisation starts at $r = 0$, where these coefficients are $0/0$. `edreg.rodrigues` switches to Taylor series for $\theta < 10^{-2}$, which gives $\partial R / \partial r_i = [e_i]_\times$ exactly at zero.
 
@@ -83,17 +83,17 @@ Jf = dV(rows, :) / sqrt(nT);
 
 ### Laplacian — `jacLap`
 
-**EN** — $E_{lap} = D^{-1} L V'$ is linear in $V'$, so $J_{lap} = (I_3 \otimes D^{-1}L)\,\partial V'/\partial P$: apply the Laplacian to the x, y and z row groups of the shared block.
+**EN** — $E_{lap} = D^{-1} L V'$ is linear in $V'$, so $J_{lap} = (I_3 \otimes D^{-1}L) \partial V'/\partial P$: apply the Laplacian to the x, y and z row groups of the shared block.
 
-**KO** — $E_{lap} = D^{-1} L V'$는 $V'$에 대해 선형이므로 $J_{lap} = (I_3 \otimes D^{-1}L)\,\partial V'/\partial P$입니다. 공용 블록의 x, y, z 행 묶음 각각에 Laplacian을 적용합니다.
+**KO** — $E_{lap} = D^{-1} L V'$는 $V'$에 대해 선형이므로 $J_{lap} = (I_3 \otimes D^{-1}L) \partial V'/\partial P$입니다. 공용 블록의 x, y, z 행 묶음 각각에 Laplacian을 적용합니다.
 
 ### Rotation 1 — `jacRot1`
 
-**EN** — $(A^\top A)_{pq} = \sum_r A_{rp} A_{rq}$, so
+**EN** — $`(A^\top A)_{pq} = \sum_r A_{rp} A_{rq}`$, so
 
-**KO** — $(A^\top A)_{pq} = \sum_r A_{rp} A_{rq}$이므로
+**KO** — $`(A^\top A)_{pq} = \sum_r A_{rp} A_{rq}`$이므로
 
-$$\frac{\partial (A^\top A)_{pq}}{\partial A_{rs}} = \delta_{sp}\,A_{rq} + \delta_{sq}\,A_{rp}$$
+$$\frac{\partial (A^\top A)_{pq}}{\partial A_{rs}} = \delta_{sp} A_{rq} + \delta_{sq} A_{rp}$$
 
 **EN** — Each node contributes an independent $9 \times 9$ block on the diagonal of the `A` columns.
 
@@ -101,11 +101,11 @@ $$\frac{\partial (A^\top A)_{pq}}{\partial A_{rs}} = \delta_{sp}\,A_{rq} + \delt
 
 ### Rotation 2 — `jacRot2`
 
-**EN** — The derivative of a determinant is the cofactor matrix. For $A = [a_1\ a_2\ a_3]$ its columns are cross products:
+**EN** — The derivative of a determinant is the cofactor matrix. For $A = [a_1 ~ a_2 ~ a_3]$ its columns are cross products:
 
-**KO** — 행렬식의 미분은 여인수 행렬입니다. $A = [a_1\ a_2\ a_3]$이면 그 열은 외적으로 쓸 수 있습니다.
+**KO** — 행렬식의 미분은 여인수 행렬입니다. $A = [a_1 ~ a_2 ~ a_3]$이면 그 열은 외적으로 쓸 수 있습니다.
 
-$$\frac{\partial \det A}{\partial A} = [\,a_2 \times a_3 \quad a_3 \times a_1 \quad a_1 \times a_2\,]$$
+$$\frac{\partial \det A}{\partial A} = [a_2 \times a_3 \quad a_3 \times a_1 \quad a_1 \times a_2]$$
 
 ### Smoothness — `jacSmooth`
 

@@ -17,7 +17,7 @@
 
 **KO** — 정합은 $\min_P \lVert F(P) \rVert^2$ 문제이고, $F$는 잔차 블록 다섯 개를 쌓은 벡터입니다. `edreg.residual`이 $F$를 (필요하면 $J = \partial F / \partial P$도) 반환합니다.
 
-$$F = \bigl[\,E_{fit};\ \ w_{rot}E_{rot1};\ \ w_{rot}E_{rot2};\ \ w_{smooth}E_{smooth};\ \ w_{lap}E_{lap}\,\bigr]$$
+$$F = \bigl[ E_{fit};\quad w_{rot}E_{rot1};\quad w_{rot}E_{rot2};\quad w_{smooth}E_{smooth};\quad w_{lap}E_{lap} \bigr]$$
 
 ```matlab
 w = edreg.defaultWeights();                       % rot = 1.0, smooth = 0.1, lap = 0.01
@@ -58,7 +58,7 @@ $$E_{smooth,k} = \frac{1}{\sqrt{3N}} \sum_{j \in \mathcal N(k)} \bigl[A_k (g_j -
 
 ### Laplacian
 
-$$E_{lap} = D^{-1} L\, V', \qquad D = \mathrm{diag}(L)$$
+$$E_{lap} = D^{-1} L  V', \qquad D = \mathrm{diag}(L)$$
 
 **EN** — $L$ is the graph Laplacian of the source mesh, so each row is the offset of a deformed vertex from the weighted mean of its neighbours. It penalises bumpy results. Size $3n$.
 
